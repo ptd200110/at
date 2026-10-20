@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>An toàn mạng máy tính – Ngân hàng câu hỏi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #f0f4f8;
+      --card: #ffffff;
+      --primary: #0d9488;
+      --primary-dark: #0f766e;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --correct: #16a34a;
+      --wrong: #dc2626;
+      --nav: #0f172a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--nav);
+      color: #fff;
+      padding: 0.75rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    header .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 600;
+    }
+    header .logo {
+      width: 36px; height: 36px;
+      background: #14b8a6;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; color: #fff;
+    }
+    header .right { display: flex; align-items: center; gap: 1rem; font-size: 0.875rem; }
+    header a { color: #94a3b8; text-decoration: none; }
+    header a:hover { color: #fff; }
+
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+    /* Home */
+    .hero { text-align: center; margin-bottom: 2.5rem; }
+    .hero .label { color: var(--primary); font-weight: 600; font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; }
+    .hero h1 { font-size: 2rem; margin: 0.5rem 0; }
+    .hero p { color: var(--muted); max-width: 520px; margin: 0 auto; }
+
+    .chapters {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .chapter-card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      transition: box-shadow 0.2s;
+    }
+    .chapter-card:hover { box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    .chapter-card .num {
+      font-size: 1.75rem; font-weight: 700; color: var(--primary);
+    }
+    .chapter-card .tag { font-size: 0.7rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+    .chapter-card h2 { font-size: 1.1rem; margin: 0.5rem 0 0.35rem; line-height: 1.35; }
+    .chapter-card .desc { color: var(--muted); font-size: 0.875rem; flex: 1; margin-bottom: 1rem; }
+    .chapter-card .meta {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.8rem; color: var(--muted); margin-bottom: 0.75rem;
+    }
+    .chapter-card .progress-bar {
+      height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin-bottom: 1rem;
+    }
+    .chapter-card .progress-bar > div {
+      height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      padding: 0.7rem 1.25rem; border-radius: 10px; border: none;
+      font-weight: 600; font-size: 0.9rem; cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary { background: var(--nav); color: #fff; width: 100%; }
+    .btn-primary:hover { background: #1e293b; }
+    .btn-outline {
+      background: transparent; border: 1px solid var(--border); color: var(--text);
+    }
+    .btn-outline:hover { background: #f8fafc; }
+    .btn-sm { padding: 0.4rem 0.85rem; font-size: 0.8rem; border-radius: 8px; }
+    .btn-teal { background: var(--primary); color: #fff; }
+    .btn-teal:hover { background: var(--primary-dark); }
+
+    /* Quiz layout */
+    .quiz-layout {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: 1.5rem;
+      align-items: start;
+    }
+    @media (max-width: 900px) {
+      .quiz-layout { grid-template-columns: 1fr; }
+      .side-panel { order: -1; }
+    }
+    .quiz-header { margin-bottom: 1.5rem; }
+    .quiz-header .label { color: var(--primary); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; }
+    .quiz-header h1 { font-size: 1.5rem; margin: 0.35rem 0; }
+    .quiz-header p { color: var(--muted); font-size: 0.9rem; }
+
+    .stats-card, .nav-card, .q-card {
+      background: var(--card);
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    }
+    .stats-card {
+      display: flex; flex-wrap: wrap; gap: 1rem; align-items: center;
+      margin-bottom: 1rem;
+    }
+    .stats-card .stat { font-size: 0.85rem; }
+    .stats-card .stat strong { display: block; font-size: 1.1rem; }
+    .stats-card .stat.green strong { color: var(--correct); }
+    .stats-card .stat.red strong { color: var(--wrong); }
+
+    .q-card { margin-bottom: 1rem; }
+    .q-meta {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.75rem; font-size: 0.8rem; color: var(--muted);
+    }
+    .q-card h2 {
+      font-size: 1.05rem; font-weight: 600; line-height: 1.5; margin-bottom: 1rem;
+    }
+    .q-images { margin: 0.75rem 0 1rem; display: flex; flex-wrap: wrap; gap: 0.75rem; }
+    .q-images img {
+      max-width: 100%; max-height: 320px; border-radius: 10px;
+      border: 1px solid var(--border); cursor: zoom-in;
+    }
+    .options { display: flex; flex-direction: column; gap: 0.5rem; }
+    .option {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.85rem 1rem; border-radius: 10px;
+      border: 1.5px solid var(--border); cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+      text-align: left; background: #fff; width: 100%;
+      font-size: 0.95rem; line-height: 1.45;
+    }
+    .option:hover { border-color: #94a3b8; }
+    .option .key {
+      flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+      background: #f1f5f9; display: flex; align-items: center; justify-content: center;
+      font-weight: 600; font-size: 0.85rem;
+    }
+    .option.selected { border-color: var(--primary); background: #f0fdfa; }
+    .option.selected .key { background: var(--primary); color: #fff; }
+    .option.correct { border-color: var(--correct); background: #f0fdf4; }
+    .option.correct .key { background: var(--correct); color: #fff; }
+    .option.wrong { border-color: var(--wrong); background: #fef2f2; }
+    .option.wrong .key { background: var(--wrong); color: #fff; }
+    .option.missed { border-color: var(--correct); background: #f0fdf4; opacity: 0.85; }
+    .option:disabled { cursor: default; }
+
+    .q-actions {
+      display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.25rem;
+      padding-top: 1rem; border-top: 1px solid var(--border);
+    }
+    .feedback {
+      margin-top: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px;
+      font-size: 0.875rem;
+    }
+    .feedback.ok { background: #f0fdf4; color: #166534; }
+    .feedback.bad { background: #fef2f2; color: #991b1b; }
+
+    .nav-card h3 { font-size: 0.9rem; margin-bottom: 0.75rem; }
+    .nav-grid {
+      display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem;
+    }
+    .nav-btn {
+      aspect-ratio: 1; border-radius: 8px; border: 1px solid var(--border);
+      background: #fff; font-size: 0.8rem; font-weight: 500; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .nav-btn:hover { background: #f8fafc; }
+    .nav-btn.current { background: var(--nav); color: #fff; border-color: var(--nav); }
+    .nav-btn.answered { background: #ccfbf1; border-color: #5eead4; color: #0f766e; }
+    .nav-btn.correct-ans { background: #dcfce7; border-color: #86efac; color: #166534; }
+    .nav-btn.wrong-ans { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+    .legend {
+      display: flex; gap: 0.75rem; flex-wrap: wrap; margin-top: 0.75rem;
+      font-size: 0.7rem; color: var(--muted);
+    }
+    .legend span::before {
+      content: ''; display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; margin-right: 4px; vertical-align: middle;
+    }
+    .legend .l-todo::before { background: #e2e8f0; }
+    .legend .l-done::before { background: #5eead4; }
+    .legend .l-ok::before { background: #86efac; }
+    .legend .l-bad::before { background: #fca5a5; }
+
+    .modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+      z-index: 100; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal.open { display: flex; }
+    .modal img { max-width: 95vw; max-height: 90vh; border-radius: 8px; }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <div class="logo">A</div>
+      <div>
+        <div>An toàn mạng</div>
+        <div style="font-size:0.7rem;font-weight:400;color:#94a3b8">Ngân hàng câu hỏi trắc nghiệm</div>
+      </div>
+    </div>
+    <div class="right">
+      <a href="#" id="btn-home" class="hidden">← Quay về chọn chương</a>
+      <span id="header-progress"></span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- HOME -->
+    <div id="view-home">
+      <div class="hero">
+        <div class="label">Trắc nghiệm An toàn thông tin mạng</div>
+        <h1>Chọn chương để bắt đầu</h1>
+        <p>Chọn một chương. Tiến độ của từng chương được lưu riêng trên trình duyệt này. Tổng cộng 473 câu hỏi có đáp án.</p>
+      </div>
+      <div class="chapters" id="chapter-list"></div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="view-quiz" class="hidden">
+      <div class="quiz-header">
+        <div class="label">Bài kiểm tra</div>
+        <h1 id="quiz-title"></h1>
+        <p>Chọn đáp án cho mỗi câu. Một số câu yêu cầu chọn nhiều phương án; bạn có thể quay lại các câu trước bất cứ lúc nào.</p>
+      </div>
+      <div class="quiz-layout">
+        <div>
+          <div class="stats-card" id="stats"></div>
+          <div class="q-card" id="question-card"></div>
+        </div>
+        <div class="side-panel">
+          <div class="nav-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem">
+              <h3 style="margin:0">Danh sách câu</h3>
+              <span id="nav-count" style="font-size:0.8rem;color:var(--muted)"></span>
+            </div>
+            <div class="nav-grid" id="nav-grid"></div>
+            <div class="legend">
+              <span class="l-todo">Chưa làm</span>
+              <span class="l-done">Đã chọn</span>
+              <span class="l-ok">Đúng</span>
+              <span class="l-bad">Sai</span>
+            </div>
+            <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem">
+              <button class="btn btn-outline btn-sm" id="btn-reset-ch">Làm lại chương này</button>
+              <button class="btn btn-outline btn-sm" id="btn-show-all">Hiện tất cả đáp án</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="img-modal">
+    <img id="modal-img" src="" alt="" />
+  </div>
+
+  <script>
+    let DATA = null;
+    let currentChapter = null;
+    let currentIndex = 0; // index in chapter questionIds
+    let state = {}; // { chapterId: { answers: {qid: [keys]}, revealed: {qid: bool}, showAll: bool } }
+
+    const STORAGE_KEY = 'atmm_quiz_v1';
+
+    function loadState() {
+      try {
+        state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      } catch { state = {}; }
+    }
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function chState(cid) {
+      if (!state[cid]) state[cid] = { answers: {}, revealed: {}, showAll: false };
+      return state[cid];
+    }
+
+    async function init() {
+      const res = await fetch('questions.json');
+      DATA = await res.json();
+      loadState();
+      renderHome();
+      document.getElementById('btn-home').addEventListener('click', e => {
+        e.preventDefault();
+        showHome();
+      });
+      document.getElementById('btn-reset-ch').addEventListener('click', () => {
+        if (confirm('Xóa toàn bộ tiến độ chương này?')) {
+          state[currentChapter] = { answers: {}, revealed: {}, showAll: false };
+          saveState();
+          currentIndex = 0;
+          renderQuiz();
+        }
+      });
+      document.getElementById('btn-show-all').addEventListener('click', () => {
+        const s = chState(currentChapter);
+        s.showAll = !s.showAll;
+        if (s.showAll) {
+          DATA.chapters[currentChapter].questionIds.forEach(id => {
+            s.revealed[id] = true;
+          });
+        }
+        saveState();
+        renderQuiz();
+      });
+      document.getElementById('img-modal').addEventListener('click', () => {
+        document.getElementById('img-modal').classList.remove('open');
+      });
+    }
+
+    function progressOf(cid) {
+      const ids = DATA.chapters[cid].questionIds;
+      const s = chState(cid);
+      let done = 0, correct = 0;
+      ids.forEach(id => {
+        const a = s.answers[id];
+        if (a && a.length) {
+          done++;
+          const q = DATA.questions[String(id)];
+          if (sameSet(a, q.correct)) correct++;
+        }
+      });
+      return { total: ids.length, done, correct, pct: ids.length ? Math.round(done / ids.length * 100) : 0 };
+    }
+
+    function sameSet(a, b) {
+      if (!a || !b || a.length !== b.length) return false;
+      const sa = [...a].sort().join(',');
+      const sb = [...b].sort().join(',');
+      return sa === sb;
+    }
+
+    function renderHome() {
+      const list = document.getElementById('chapter-list');
+      list.innerHTML = '';
+      Object.keys(DATA.chapters).sort().forEach(cid => {
+        const ch = DATA.chapters[cid];
+        const p = progressOf(cid);
+        const card = document.createElement('div');
+        card.className = 'chapter-card';
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <span class="num">${String(cid).padStart(2,'0')}</span>
+            <span class="tag">Chương</span>
+          </div>
+          <h2>${ch.name.replace(/^Chương \\d+ – /, '')}</h2>
+          <p class="desc">${ch.desc}</p>
+          <div class="meta">
+            <span>${p.done ? (p.done + '/' + p.total + ' đã làm') : 'Chưa làm'}</span>
+            <span style="color:var(--primary);font-weight:600">${p.total} câu</span>
+          </div>
+          <div class="progress-bar"><div style="width:${p.pct}%"></div></div>
+          <button class="btn btn-primary" data-ch="${cid}">Bắt đầu</button>
+        `;
+        card.querySelector('button').addEventListener('click', () => startChapter(cid));
+        list.appendChild(card);
+      });
+    }
+
+    function startChapter(cid) {
+      currentChapter = cid;
+      currentIndex = 0;
+      // resume at first unanswered if any
+      const ids = DATA.chapters[cid].questionIds;
+      const s = chState(cid);
+      const firstUn = ids.findIndex(id => !(s.answers[id] && s.answers[id].length));
+      if (firstUn >= 0) currentIndex = firstUn;
+      showQuiz();
+      renderQuiz();
+    }
+
+    function showHome() {
+      document.getElementById('view-home').classList.remove('hidden');
+      document.getElementById('view-quiz').classList.add('hidden');
+      document.getElementById('btn-home').classList.add('hidden');
+      document.getElementById('header-progress').textContent = '';
+      renderHome();
+    }
+    function showQuiz() {
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-quiz').classList.remove('hidden');
+      document.getElementById('btn-home').classList.remove('hidden');
+    }
+
+    function renderQuiz() {
+      const ch = DATA.chapters[currentChapter];
+      const ids = ch.questionIds;
+      const s = chState(currentChapter);
+      const p = progressOf(currentChapter);
+
+      document.getElementById('quiz-title').textContent = ch.name;
+      document.getElementById('header-progress').textContent =
+        `Chương ${currentChapter} · ${p.done}/${p.total} câu đã làm`;
+
+      // stats
+      let checked = 0, ok = 0, bad = 0;
+      ids.forEach(id => {
+        if (s.revealed[id] || s.showAll) {
+          const a = s.answers[id] || [];
+          if (a.length) {
+            checked++;
+            if (sameSet(a, DATA.questions[String(id)].correct)) ok++;
+            else bad++;
+          }
+        }
+      });
+      document.getElementById('stats').innerHTML = `
+        <div class="stat"><strong>${p.done}/${p.total}</strong> Đã làm</div>
+        <div class="stat green"><strong>${ok}</strong> Đúng</div>
+        <div class="stat red"><strong>${bad}</strong> Sai</div>
+        <div class="stat"><strong>${p.pct}%</strong> Tiến độ</div>
+      `;
+
+      // nav grid
+      const grid = document.getElementById('nav-grid');
+      grid.innerHTML = '';
+      document.getElementById('nav-count').textContent = ids.length + ' câu';
+      ids.forEach((id, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'nav-btn';
+        btn.textContent = idx + 1;
+        if (idx === currentIndex) btn.classList.add('current');
+        const ans = s.answers[id];
+        const revealed = s.revealed[id] || s.showAll;
+        if (revealed && ans && ans.length) {
+          if (sameSet(ans, DATA.questions[String(id)].correct)) btn.classList.add('correct-ans');
+          else btn.classList.add('wrong-ans');
+        } else if (ans && ans.length) {
+          btn.classList.add('answered');
+        }
+        btn.addEventListener('click', () => { currentIndex = idx; renderQuiz(); });
+        grid.appendChild(btn);
+      });
+
+      // question
+      const qid = ids[currentIndex];
+      const q = DATA.questions[String(qid)];
+      const card = document.getElementById('question-card');
+      const selected = s.answers[qid] || [];
+      const revealed = s.revealed[qid] || s.showAll;
+
+      let imgsHtml = '';
+      if (q.images && q.images.length) {
+        imgsHtml = '<div class="q-images">' + q.images.map(src =>
+          `<img src="images/${src}" alt="Hình minh họa" loading="lazy" onclick="openImg(this.src)" />`
+        ).join('') + '</div>';
+      }
+
+      let optsHtml = q.options.map(opt => {
+        let cls = 'option';
+        const isSel = selected.includes(opt.key);
+        if (revealed) {
+          const isCorr = q.correct.includes(opt.key);
+          if (isCorr) cls += ' correct';
+          else if (isSel) cls += ' wrong';
+          else if (isCorr) cls += ' missed';
+        } else if (isSel) {
+          cls += ' selected';
+        }
+        return `<button class="${cls}" data-key="${opt.key}" ${revealed ? 'disabled' : ''}>
+          <span class="key">${opt.key}</span>
+          <span>${escapeHtml(opt.text)}</span>
+        </button>`;
+      }).join('');
+
+      let feedback = '';
+      if (revealed && selected.length) {
+        const ok = sameSet(selected, q.correct);
+        feedback = `<div class="feedback ${ok ? 'ok' : 'bad'}">
+          ${ok ? '✓ Đáp án đúng!' : '✗ Chưa chính xác. Đáp án đúng: ' + q.correct.join(', ')}
+          ${q.multi ? ' (câu chọn nhiều đáp án)' : ''}
+        </div>`;
+      }
+
+      card.innerHTML = `
+        <div class="q-meta">
+          <span>Câu ${currentIndex + 1} / ${ids.length} <span style="opacity:0.6">· #${qid}</span></span>
+          <span>${selected.length ? 'Đã chọn' : 'Chưa làm'}${q.multi ? ' · Chọn nhiều' : ''}</span>
+        </div>
+        <h2>${escapeHtml(q.question)}</h2>
+        ${imgsHtml}
+        <div class="options">${optsHtml}</div>
+        ${feedback}
+        <div class="q-actions">
+          <button class="btn btn-outline btn-sm" id="btn-prev" ${currentIndex === 0 ? 'disabled' : ''}>← Câu trước</button>
+          <button class="btn btn-outline btn-sm" id="btn-next" ${currentIndex >= ids.length - 1 ? 'disabled' : ''}>Câu sau →</button>
+          <button class="btn btn-teal btn-sm" id="btn-check">${revealed ? 'Ẩn đáp án' : 'Hiện đáp án'}</button>
+        </div>
+      `;
+
+      if (!revealed) {
+        card.querySelectorAll('.option').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const key = btn.dataset.key;
+            let arr = [...(s.answers[qid] || [])];
+            if (q.multi) {
+              if (arr.includes(key)) arr = arr.filter(k => k !== key);
+              else arr.push(key);
+            } else {
+              arr = [key];
+            }
+            s.answers[qid] = arr;
+            saveState();
+            renderQuiz();
+          });
+        });
+      }
+
+      document.getElementById('btn-prev').addEventListener('click', () => {
+        if (currentIndex > 0) { currentIndex--; renderQuiz(); }
+      });
+      document.getElementById('btn-next').addEventListener('click', () => {
+        if (currentIndex < ids.length - 1) { currentIndex++; renderQuiz(); }
+      });
+      document.getElementById('btn-check').addEventListener('click', () => {
+        s.revealed[qid] = !s.revealed[qid];
+        saveState();
+        renderQuiz();
+      });
+    }
+
+    function escapeHtml(t) {
+      const d = document.createElement('div');
+      d.textContent = t || '';
+      return d.innerHTML;
+    }
+    function openImg(src) {
+      document.getElementById('modal-img').src = src;
+      document.getElementById('img-modal').classList.add('open');
+    }
+
+    init();
+  </script>
+</body>
+</html>
